@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"encoding/xml"
 	"fmt"
 	"net/http"
 
@@ -29,13 +28,20 @@ func (ch *CustomerHandlers) getAllCustomers(w http.ResponseWriter, r *http.Reque
 	// 	{"ashish ", " newdelhi", "93939"},
 	// 	{"nayan", "jaipur", "302039"},
 	// }
-	customers, _ := ch.service.GetAllCustomer()
-	if r.Header.Get("content-Type") == "application/xml" {
-		w.Header().Add("Content-Type", "appliction/xml")
-		xml.NewEncoder(w).Encode(customers)
+	status := r.URL.Query().Get("status")
+	customers, err := ch.service.GetAllCustomer(status)
+	if err != nil {
+		WriteResponse(w, err.Code, err.AsMessage())
+		//w.Header().Add("Content-Type", "application/json")
+		//w.WriteHeader(err.Code)
+		//fmt.Fprint(w, err.Message)
+		//json.NewEncoder(w).Encode(err.AsMessage())
 	} else {
-		w.Header().Add("Content-Type", "appliction/json")
-		json.NewEncoder(w).Encode(customers)
+		WriteResponse(w, http.StatusOK, customers)
+		// w.Header().Add("Content-Type", "application/json")
+		// w.WriteHeader(http.StatusOK)
+		// json.NewEncoder(w).Encode(customer)
+
 	}
 	//json.NewEncoder(w).Encode(customers)
 
@@ -56,16 +62,16 @@ func (ch *CustomerHandlers) GetCustomer(w http.ResponseWriter, r *http.Request) 
 	customer, err := ch.service.GetCustomer(id)
 
 	if err != nil {
-		//WriteResponse(w, err.Code, err.AsMessage())
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(err.Code)
+		WriteResponse(w, err.Code, err.AsMessage())
+		//w.Header().Add("Content-Type", "application/json"8)
+		//w.WriteHeader(err.Code)
 		//fmt.Fprint(w, err.Message)
-		json.NewEncoder(w).Encode(err.AsMessage())
+		//json.NewEncoder(w).Encode(err.AsMessage())
 	} else {
-		//WriteResponse(w, http.StatusOK, customer)
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(customer)
+		WriteResponse(w, http.StatusOK, customer)
+		// w.Header().Add("Content-Type", "application/json")
+		// w.WriteHeader(http.StatusOK)
+		// json.NewEncoder(w).Encode(customer)
 
 	}
 }

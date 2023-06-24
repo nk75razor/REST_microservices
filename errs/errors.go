@@ -3,7 +3,7 @@ package errs
 import "net/http"
 
 type AppError struct {
-	Code    int `json:",omitempty"`// this is to omit the code error in error json message
+	Code    int `json:",omitempty"` // this is to omit the code error in error json message
 	Message string
 }
 
@@ -24,5 +24,12 @@ func NewUnexpectedError(message string) *AppError {
 	return &AppError{
 		Message: message,
 		Code:    http.StatusInternalServerError,
+	}
+}
+
+func NewValidationError(message string) *AppError {
+	return &AppError{
+		Message: message,
+		Code:    http.StatusUnprocessableEntity,
 	}
 }
